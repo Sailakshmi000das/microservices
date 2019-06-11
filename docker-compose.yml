@@ -1,0 +1,65 @@
+version: "2"
+services:
+
+  apigateway:
+    build: spring-gateway-api/
+    restart: always
+    network_mode: host
+    depends_on:
+      - eurekaserver
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+
+  eurekaserver:
+    build: spring-eureka-server/
+    restart: always
+    network_mode: host
+    ports:
+      - "8761:8761"
+    expose:
+      - "8761"
+
+  configserver:
+    build: spring-config-server/
+    restart: always
+    network_mode: host
+    ports:
+      - "8888:8888"
+    expose:
+      - "8888"
+
+  mongo:
+    image: mongo
+    container_name: mongo-container
+    environment:
+      MONGO_DATABASE: trackDb
+
+  muzixservice:
+    build: muzix-service/
+    restart: always
+    network_mode: host
+    depends_on:
+      - mongo
+      - eurekaserver
+      - apigateway
+    ports:
+      - "8070:8070"
+    expose:
+      - "8070"
+
+  userservice:
+    build: user-service/
+    restart: always
+    network_mode: host
+    depends_on:
+      - eurekaserver
+      - apigateway
+    ports:
+      - "8090:8090"
+    expose:
+      - "8090"
+
+
+
